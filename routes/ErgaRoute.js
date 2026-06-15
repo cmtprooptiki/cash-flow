@@ -8,6 +8,8 @@ import {
 } from "../controllers/Erga.js"
 import { verifyUser,adminOnly } from "../middleware/AuthUser.js";
 import { upload } from "../middleware/multer-config.js";  // Import multer config
+import { getErga, getErgaById, createErga, updateErga, deleteErga, bulkGenerateCodes } from "../controllers/Erga.js";
+
 
 const router = express.Router();
 
@@ -19,5 +21,6 @@ router.post('/erga',upload.single('logoImage'),verifyUser,adminOnly,createErga);
 router.patch('/erga/:id',verifyUser,adminOnly,upload.single('logoImage'),updateErga);
 router.delete('/erga/:id',verifyUser,adminOnly,deleteErga);
 
+router.get('/generate-codes', verifyUser, adminOnly, bulkGenerateCodes);
 
 export default router;

@@ -173,3 +173,45 @@ export const deleteErga = async (req, res) => {
     res.status(400).json({ msg: error.message });
   }
 };
+
+export const bulkGenerateCodes = async (req, res) => {
+  const TRACKED_STATUSES = ['Υπογεγραμμένο', 'Ολοκληρωμένο', 'Αποπληρωμένο'];
+ 
+  try {
+    const ergas = await Erga.findAll({
+      where: { status: { [Op.in]: TRACKED_STATUSES } },
+      attributes: ['id', 'customer_id', 'sign_date', 'erga_code'],
+    });
+ 
+    const results = { updated: 0, skipped: 0, errors: [] };
+ 
+    for (const erga of ergas) {
+      try {
+        const newCode = await generateErgaCode(
+          erga.customer_id,
+          erga.sign_date,
+          erga.erga_code
+        );
+ 
+        if (!newCode) {
+          results.skipped++;
+          continue;
+        }
+ 
+        // Only write to DB if code actually changed
+        if (newCode !== erga.erga_code) {
+          await Erga.update({ erga_code: newCode }, { where: { id: erga.id } });
+          results.updated++;
+        } else {
+          results.skipped++;
+        }
+      } catch (err) {
+        results.errors.push({ id: erga.id, error: err.message });
+      }
+    }
+ 
+    res.status(200).json({ msg: 'Bulk code generation complete', ...results });
+  } catch (error) {
+    res.status(500).json({ msg: error.message });
+  }
+};
