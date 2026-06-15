@@ -185,7 +185,7 @@ export const bulkGenerateCodes = async (req, res) => {
   try {
     const ergas = await Erga.findAll({
       where: { status: { [Op.in]: TRACKED_STATUSES } },
-      attributes: ['id', 'customer_id', 'sign_date', 'erga_code'],
+      attributes: ['id', 'name', 'customer_id', 'sign_date', 'ammount_total', 'status', 'erga_code'],
     });
  
     const results = { updated: 0, skipped: 0, errors: [] };
@@ -203,13 +203,24 @@ export const bulkGenerateCodes = async (req, res) => {
           continue;
         }
  
-        // Only write to DB if code actually changed
         if (newCode !== erga.erga_code) {
           await Erga.update({ erga_code: newCode }, { where: { id: erga.id } });
           results.updated++;
         } else {
           results.skipped++;
         }
+ 
+        // Notify tracker for every erga regardless of whether code changed
+        notifyTracker({
+          id: erga.id,
+          name: erga.name,
+          erga_code: newCode,
+          sign_date: erga.sign_date,
+          ammount_total: erga.ammount_total,
+          status: erga.status,
+          customer_id: erga.customer_id,
+        });
+ 
       } catch (err) {
         results.errors.push({ id: erga.id, error: err.message });
       }
