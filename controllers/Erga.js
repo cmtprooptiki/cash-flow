@@ -32,17 +32,22 @@ async function generateErgaCode(customer_id, sign_date, existingCode = null) {
   const year = new Date(sign_date).getFullYear();
   const base = `${customer.customer_code}/${year}`;
  
-  // Base unchanged — keep exact same code (preserves suffix, no conflicts)
+  // Base unchanged — keep exact same code
   if (existingCode && existingCode.startsWith(base + '/')) {
     return existingCode;
   }
  
-  // Base changed — count existing entries to get next suffix
-  const count = await Erga.count({
-    where: { erga_code: { [Op.like]: `${base}/%` } },
-  });
+  // Find the first available suffix instead of relying on count
+  let suffix = 0;
+  let candidate;
+  do {
+    candidate = `${base}/${suffix.toString().padStart(2, '0')}`;
+    const taken = await Erga.findOne({ where: { erga_code: candidate }, attributes: ['id'] });
+    if (!taken) break;
+    suffix++;
+  } while (suffix < 100);
  
-  return `${base}/${count.toString().padStart(2, '0')}`;
+  return candidate;
 }
  
 export const getErga = async(req,res)=>{
