@@ -8,7 +8,7 @@ import {
 } from "../controllers/Erga.js"
 import { verifyUser,adminOnly } from "../middleware/AuthUser.js";
 import { upload } from "../middleware/multer-config.js";  // Import multer config
-import { getErga, getErgaById, createErga, updateErga, deleteErga, bulkGenerateCodes } from "../controllers/Erga.js";
+import { bulkGenerateCodes } from "../controllers/Erga.js";
 
 
 const router = express.Router();
