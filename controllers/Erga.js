@@ -57,7 +57,7 @@ export const getErga = async(req,res)=>{
             'sign_ammount_no_tax','status','estimate_start_date',
             'project_manager','customer_id','shortname','ammount','ammount_vat',
             'ammount_total','estimate_payment_date','estimate_payment_date_2',
-            'estimate_payment_date_3','erga_cat_id','erga_code','end_date','description'],
+            'estimate_payment_date_3','erga_cat_id','erga_code','end_date','description', 'symvallomenos'],
             include: [
                 { model: Customer, attributes: ['name'] },
                 { model: ErgaCategories, attributes: ['name'] },
@@ -76,7 +76,7 @@ export const getErgaById = async(req,res)=>{
             'sign_ammount_no_tax','status','estimate_start_date',
             'project_manager','customer_id','shortname','ammount','ammount_vat',
             'ammount_total','estimate_payment_date','estimate_payment_date_2',
-            'estimate_payment_date_3','erga_cat_id','erga_code','end_date','description'],
+            'estimate_payment_date_3','erga_cat_id','erga_code','end_date','description', 'symvallomenos'],
             where:{ id:req.params.id }
         });
         res.status(200).json(response);
@@ -89,7 +89,7 @@ export const createErga = async(req, res) => {
   const {name, color, sign_ammount_no_tax, sign_date, status, estimate_start_date,
     project_manager, customer_id, shortname, ammount, ammount_vat, ammount_total,
     estimate_payment_date, estimate_payment_date_2, estimate_payment_date_3,
-    erga_cat_id, end_date, description} = req.body;
+    erga_cat_id, end_date, description, symvallomenos} = req.body;
  
   let logoImage = 'uploads\\nologo.png';
   if (req.file) logoImage = req.file.path;
@@ -102,7 +102,7 @@ export const createErga = async(req, res) => {
       estimate_start_date, project_manager, customer_id, shortname,
       ammount, ammount_vat, ammount_total, estimate_payment_date,
       estimate_payment_date_2, estimate_payment_date_3, erga_cat_id,
-      erga_code, end_date, description,
+      erga_code, end_date, description, symvallomenos,
     });
  
     notifyTracker(newErga);
@@ -120,7 +120,7 @@ export const updateErga = async(req, res) => {
   const {name, color, sign_ammount_no_tax, sign_date, status, estimate_start_date,
     project_manager, customer_id, shortname, ammount, ammount_vat, ammount_total,
     estimate_payment_date, estimate_payment_date_2, estimate_payment_date_3,
-    erga_cat_id, end_date, description} = req.body;
+    erga_cat_id, end_date, description, symvallomenos} = req.body;
  
   let logoImage = erga.logoImage;
   if (req.file) logoImage = req.file.path;
@@ -138,10 +138,10 @@ export const updateErga = async(req, res) => {
       estimate_start_date, project_manager, customer_id, shortname,
       ammount, ammount_vat, ammount_total, estimate_payment_date,
       estimate_payment_date_2, estimate_payment_date_3, erga_cat_id,
-      erga_code, end_date, description,
+      erga_code, end_date, description, symvallomenos,
     }, { where: { id: erga.id } });
  
-    notifyTracker({ id: erga.id, name, erga_code, sign_date, ammount_total, status, customer_id });
+    notifyTracker({ id: erga.id, name, erga_code, sign_date, end_date, ammount_total, status, customer_id });
  
     res.status(200).json({msg: "Erga update Successfully"});
   } catch(error) {
@@ -185,7 +185,7 @@ export const bulkGenerateCodes = async (req, res) => {
   try {
     const ergas = await Erga.findAll({
       where: { status: { [Op.in]: TRACKED_STATUSES } },
-      attributes: ['id', 'name', 'customer_id', 'sign_date', 'ammount_total', 'status', 'erga_code'],
+      attributes: ['id', 'name', 'customer_id', 'sign_date', 'end_date', 'ammount_total', 'status', 'erga_code'],
     });
  
     const results = { updated: 0, skipped: 0, errors: [] };
@@ -216,6 +216,7 @@ export const bulkGenerateCodes = async (req, res) => {
           name: erga.name,
           erga_code: newCode,
           sign_date: erga.sign_date,
+          end_date: erga.end_date,
           ammount_total: erga.ammount_total,
           status: erga.status,
           customer_id: erga.customer_id,
