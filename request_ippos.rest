@@ -799,3 +799,7 @@ Content-Type: application/json
 
 ### //GET YPO by Id
 GET https://api.cashflow.cmtprooptiki.gr:4002/paradotea/3
+
+
+######
+GET https://api.cashflow.cmtprooptiki.gr:4002/getParadoteoAndErgoByTimologio/71

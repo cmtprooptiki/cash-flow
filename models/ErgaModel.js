@@ -135,6 +135,11 @@ const Erga = db.define('erga',{
         type: DataTypes.STRING(500),
         allowNull: true 
     },
+    symvallomenos:
+    {
+        type: DataTypes.STRING(500),
+        allowNull: true 
+    },
     end_date:{
         type: DataTypes.DATEONLY,
         allowNull: true,
