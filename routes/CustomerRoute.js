@@ -11,10 +11,10 @@ import { upload } from "../middleware/multer-config.js";  // Import multer confi
 
 const router = express.Router();
 
-router.get('/customer',verifyUser,adminOnly, getCustomer);
-router.get('/customer/:id',verifyUser,adminOnly,getCustomerById);
-router.post('/customer',upload.single('logoImage'),verifyUser,adminOnly,createCustomer);
-router.patch('/customer/:id',verifyUser,adminOnly,upload.single('logoImage'),updateCustomer);
+router.get('/customer',verifyUser, getCustomer);
+router.get('/customer/:id',verifyUser,getCustomerById);
+router.post('/customer',upload.single('logoImage'),verifyUser,createCustomer);
+router.patch('/customer/:id',verifyUser,upload.single('logoImage'),updateCustomer);
 router.delete('/customer/:id',verifyUser,adminOnly,deleteCustomer);
 
 

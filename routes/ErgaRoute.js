@@ -13,12 +13,12 @@ import { bulkGenerateCodes } from "../controllers/Erga.js";
 
 const router = express.Router();
 
-router.get('/erga',verifyUser,adminOnly, getErga);
-router.get('/erga/:id',verifyUser,adminOnly,getErgaById);
+router.get('/erga',verifyUser, getErga);
+router.get('/erga/:id',verifyUser,getErgaById);
 
 //logo image uploade
 router.post('/erga',upload.single('logoImage'),verifyUser,adminOnly,createErga);
-router.patch('/erga/:id',verifyUser,adminOnly,upload.single('logoImage'),updateErga);
+router.patch('/erga/:id',verifyUser,upload.single('logoImage'),updateErga);
 router.delete('/erga/:id',verifyUser,adminOnly,deleteErga);
 
 router.get('/generate-codes', verifyUser, adminOnly, bulkGenerateCodes);
